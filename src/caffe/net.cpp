@@ -749,35 +749,46 @@ void Net<Dtype>::Reshape() {
 template <typename Dtype>
 void Net<Dtype>::CopyTrainedLayersFrom(const NetParameter& param) {
   int num_source_layers = param.layer_size();
-  for (int i = 0; i < num_source_layers; ++i) {
+  for (int i = 0; i < num_source_layers; ++i) 
+  {
     const LayerParameter& source_layer = param.layer(i);
     const string& source_layer_name = source_layer.name();
     int target_layer_id = 0;
+
+    // if not reach the end then keep finding if the layer names match any source_layer_name
     while (target_layer_id != layer_names_.size() &&
         layer_names_[target_layer_id] != source_layer_name) {
       ++target_layer_id;
     }
-    if (target_layer_id == layer_names_.size()) {
+
+    if (target_layer_id == layer_names_.size()) { // do not found and reach the end
       LOG(INFO) << "Ignoring source layer " << source_layer_name;
       continue;
     }
+
     DLOG(INFO) << "Copying source layer " << source_layer_name;
     vector<shared_ptr<Blob<Dtype> > >& target_blobs =
         layers_[target_layer_id]->blobs();
     CHECK_EQ(target_blobs.size(), source_layer.blobs_size())
         << "Incompatible number of blobs for layer " << source_layer_name;
     for (int j = 0; j < target_blobs.size(); ++j) {
-      if (!target_blobs[j]->ShapeEquals(source_layer.blobs(j))) {
-        Blob<Dtype> source_blob;
-        const bool kReshape = true;
-        source_blob.FromProto(source_layer.blobs(j), kReshape);
-        LOG(FATAL) << "Cannot copy param " << j << " weights from layer '"
-            << source_layer_name << "'; shape mismatch.  Source param shape is "
-            << source_blob.shape_string() << "; target param shape is "
-            << target_blobs[j]->shape_string() << ". "
-            << "To learn this layer's parameters from scratch rather than "
-            << "copying from a saved net, rename the layer.";
-      }
+        if(target_blobs[j]->shape().size() == 1  
+                && source_layer.blobs(j).shape().dim(0) == 1 
+                && source_layer.blobs(j).shape().dim(1) == 1 
+                && source_layer.blobs(j).shape().dim(2) == 1 
+                && source_layer.blobs(j).shape().dim(3) == target_blobs[j]->shape(0))
+        { }else if (!target_blobs[j]->ShapeEquals(source_layer.blobs(j))) {
+            Blob<Dtype> source_blob;
+            const bool kReshape = true;
+            source_blob.FromProto(source_layer.blobs(j), kReshape);
+
+            LOG(FATAL) << "Cannot copy param " << j << " weights from layer '"
+                << source_layer_name << "'; shape mismatch.  Source param shape is "
+                << source_blob.shape_string() << "; target param shape is "
+                << target_blobs[j]->shape_string() << ". "
+                << "To learn this layer's parameters from scratch rather than "
+                << "copying from a saved net, rename the layer.";
+        }
       const bool kReshape = false;
       target_blobs[j]->FromProto(source_layer.blobs(j), kReshape);
     }
@@ -810,7 +821,9 @@ void Net<Dtype>::CopyTrainedLayersFromHDF5(const string trained_filename) {
   hid_t data_hid = H5Gopen2(file_hid, "data", H5P_DEFAULT);
   CHECK_GE(data_hid, 0) << "Error reading weights from " << trained_filename;
   int num_layers = hdf5_get_num_links(data_hid);
-  for (int i = 0; i < num_layers; ++i) {
+  // start copy layer by layer:
+  for (int i = 0; i < num_layers; ++i) 
+  {
     string source_layer_name = hdf5_get_name_by_idx(data_hid, i);
     if (!layer_names_index_.count(source_layer_name)) {
       LOG(INFO) << "Ignoring source layer " << source_layer_name;

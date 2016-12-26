@@ -408,6 +408,12 @@ bool Blob<Dtype>::ShapeEquals(const BlobProto& other) {
   for (int i = 0; i < other.shape().dim_size(); ++i) {
     other_shape[i] = other.shape().dim(i);
   }
+
+  if(shape_.size() == 1 && other_shape[0] == 1 && other_shape[1] == 1 && other_shape[2] == 1 && other_shape[3] == shape_[0])
+  {
+    LOG(WARNING) << "[ShapeEquals] get shape_ in size#1 dim " <<  shape_[0] << " and other_shape in size#4 " << other_shape[0] << " " << other_shape[1] << " " << other_shape[2] << " " << other_shape[3];
+    return true;
+  }
   return shape_ == other_shape;
 }
 
