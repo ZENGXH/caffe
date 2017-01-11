@@ -4,9 +4,11 @@
 #include <algorithm>
 #include <iterator>
 
+#include <vector>
 #include "boost/random/mersenne_twister.hpp"
 #include "boost/random/uniform_int.hpp"
 
+#include "boost/random/uniform_01.hpp"
 #include "caffe/common.hpp"
 
 namespace caffe {
@@ -37,6 +39,14 @@ inline void shuffle(RandomAccessIterator begin, RandomAccessIterator end,
 template <class RandomAccessIterator>
 inline void shuffle(RandomAccessIterator begin, RandomAccessIterator end) {
   shuffle(begin, end, caffe_rng());
+};
+
+template <class RandomGenerator> 
+inline double roll_dice(RandomGenerator* gen) {
+    //boost::uniform_01<RandomGenerator> dist;
+    //return dist(*gen);
+    std::uniform_real_distribution<double> u01; // same as u01(0.0, 1.0); see Note below
+    return u01(*gen);
 }
 }  // namespace caffe
 

@@ -128,6 +128,10 @@ inline bool ReadImageToDatum(const string& filename, const int label,
 
 bool DecodeDatumNative(Datum* datum);
 bool DecodeDatum(Datum* datum, bool is_color);
+template<typename Dtype>
+void SaveBinFile(const Dtype *pdata, const int num, const int chn,
+    const int height, const int width, const string &path_file);
+
 
 #ifdef USE_OPENCV
 cv::Mat ReadImageToCVMat(const string& filename,
@@ -145,6 +149,8 @@ cv::Mat DecodeDatumToCVMatNative(const Datum& datum);
 cv::Mat DecodeDatumToCVMat(const Datum& datum, bool is_color);
 
 void CVMatToDatum(const cv::Mat& cv_img, Datum* datum);
+
+
 #endif  // USE_OPENCV
 
 }  // namespace caffe

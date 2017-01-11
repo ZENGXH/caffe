@@ -162,6 +162,33 @@ bool ReadFileToDatum(const string& filename, const int label,
   }
 }
 
+
+template<> 
+void SaveBinFile<float>(const float *pdata, const int num, const int chn, const int height, const int width, const string &path_file) 
+{ 
+    FILE  *fid = fopen(path_file.c_str(), "wb"); 
+           CHECK(fid != NULL) << "faied to open file " << path_file; 
+           fwrite(&(num), sizeof(int), 1, fid); 
+           fwrite(&(chn), sizeof(int), 1, fid); 
+           fwrite(&(height), sizeof(int), 1, fid); 
+           fwrite(&(width), sizeof(int), 1, fid); 
+           fwrite(pdata, sizeof(float), width * height * chn * num, fid); 
+           fclose(fid); 
+} 
+ 
+template<> 
+void SaveBinFile<double>(const double *pdata, const int num, const int chn, const int height, const int width, const string &path_file) 
+{ 
+    FILE  *fid = fopen(path_file.c_str(), "wb"); 
+           CHECK(fid != NULL) << "faied to open file " << path_file; 
+           fwrite(&(num), sizeof(int), 1, fid); 
+           fwrite(&(chn), sizeof(int), 1, fid); 
+           fwrite(&(height), sizeof(int), 1, fid); 
+           fwrite(&(width), sizeof(int), 1, fid); 
+           fwrite(pdata, sizeof(double), width * height * chn * num, fid); 
+           fclose(fid); 
+}    
+
 #ifdef USE_OPENCV
 cv::Mat DecodeDatumToCVMatNative(const Datum& datum) {
   cv::Mat cv_img;
@@ -234,5 +261,8 @@ void CVMatToDatum(const cv::Mat& cv_img, Datum* datum) {
   }
   datum->set_data(buffer);
 }
+
+
+
 #endif  // USE_OPENCV
 }  // namespace caffe
