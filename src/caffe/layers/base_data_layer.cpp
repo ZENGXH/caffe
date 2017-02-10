@@ -84,6 +84,7 @@ void BasePrefetchingDataLayer<Dtype>::InternalThreadEntry() {
   try {
     while (!must_stop()) {
       Batch<Dtype>* batch = prefetch_free_.pop();
+      DLOG(INFO) << "load_batch call " << batch->data_.shape_string();
       load_batch(batch);
 #ifndef CPU_ONLY
       if (Caffe::mode() == Caffe::GPU) {

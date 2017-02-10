@@ -762,26 +762,27 @@ void Net<Dtype>::CopyTrainedLayersFrom(const NetParameter& param) {
     }
 
     if (target_layer_id == layer_names_.size()) { // do not found and reach the end
-      LOG(INFO) << "Ignoring source layer " << source_layer_name;
+      LOG(INFO) << "    Ignoring source layer " << source_layer_name;
       continue;
     }
+    LOG(INFO) << "Copying source layer " << source_layer_name;
 
-    DLOG(INFO) << "Copying source layer " << source_layer_name;
     vector<shared_ptr<Blob<Dtype> > >& target_blobs =
         layers_[target_layer_id]->blobs();
     CHECK_EQ(target_blobs.size(), source_layer.blobs_size())
         << "Incompatible number of blobs for layer " << source_layer_name;
     for (int j = 0; j < target_blobs.size(); ++j) {
-        if(target_blobs[j]->shape().size() == 1  
+        LOG(INFO) << "here" << target_blobs[j]->shape().size() << " dim " << source_layer.blobs(j).shape().dim().size();
+        if(target_blobs[j]->shape().size() == 1 && source_layer.blobs(j).shape().dim().size() == 4  
                 && source_layer.blobs(j).shape().dim(0) == 1 
                 && source_layer.blobs(j).shape().dim(1) == 1 
                 && source_layer.blobs(j).shape().dim(2) == 1 
-                && source_layer.blobs(j).shape().dim(3) == target_blobs[j]->shape(0))
-        { }else if (!target_blobs[j]->ShapeEquals(source_layer.blobs(j))) {
+                && source_layer.blobs(j).shape().dim(3) == target_blobs[j]->shape(0)) {
+        } else if (!target_blobs[j]->ShapeEquals(source_layer.blobs(j))) {
             Blob<Dtype> source_blob;
             const bool kReshape = true;
             source_blob.FromProto(source_layer.blobs(j), kReshape);
-
+            
             LOG(FATAL) << "Cannot copy param " << j << " weights from layer '"
                 << source_layer_name << "'; shape mismatch.  Source param shape is "
                 << source_blob.shape_string() << "; target param shape is "

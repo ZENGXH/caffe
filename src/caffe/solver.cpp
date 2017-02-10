@@ -1,5 +1,5 @@
 #include <cstdio>
-
+#include <thread> 
 #include <string>
 #include <vector>
 
@@ -246,6 +246,32 @@ void Solver<Dtype>::Step(int iters) {
               << result_vec[k] << loss_msg_stream.str();
         }
       }
+
+        // display time left
+        static struct timespec start, end;
+        static bool time_spec_start=false;
+        static int display_iter = iter_;
+        if(time_spec_start && display_iter != iter_) {
+            display_iter = iter_;
+            clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+            if(iter_ > 0){
+                float average_time = ((end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) * 1E-9)/param_.display();
+                float remaining_time = average_time * (param_.max_iter() - iter_);
+                int remaining_hour = floor(remaining_time / 3600);
+                int remaining_min = round(remaining_time / 60 - remaining_hour * 60);
+                LOG(INFO) << "Speed: "
+                    << average_time
+                    << "s / iter."
+                    << "  "
+                    << remaining_hour
+                    << ":"
+                    << remaining_min
+                    << " (H:M) to go.";
+
+            }
+        }
+        clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+        time_spec_start=true;
     }
     for (int i = 0; i < callbacks_.size(); ++i) {
       callbacks_[i]->on_gradients_ready();
