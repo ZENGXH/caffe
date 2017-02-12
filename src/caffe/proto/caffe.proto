@@ -420,7 +420,9 @@ message HPDataParameter {
   optional bool shuffle = 5;
   // Specify the root folder for the image
   optional string img_root_folder = 6;
+  optional bool is_verify = 7 [default = false];
 }
+
 message HPTransformationParameter {
   // For data pre-processing, we can do simple scaling and subtracting the
   // data mean, if provided. Note that the mean subtraction is always carried
@@ -467,10 +469,23 @@ message HPTransformationParameter {
   optional float limb_width = 37 [default = 1];
   optional bool need_center_map = 38 [default = false];
   optional bool need_binary_mask = 39 [default = false];
-}
+  optional bool do_bbox_regression = 40 [default = false]; 
+  optional float target_dist = 41 [default = 1.0];
+  optional string dataset = 42 [default = "COCO"];
+ // for cpm_data_transformer
+  optional uint32 num_parts = 43 [default = 17];
+  optional uint32 num_total_augs = 44 [default = 82];
+  optional uint32 np_in_lmdb = 135 [default = 17];
+  optional bool put_gaussian = 139 [default = true];
+  optional bool has_masks = 140 [default = false];
+  optional bool analysis = 141 [default = false];
+  optional bool use_segmentation_scale = 142 [default = false];
+  optional bool selective_scale = 143 [default = false];
+  optional bool per_part_scale = 144 [default = false];
+  optional float fix_dice = 45 [default = -1];
+  optional bool debug = 46 [default = false];
 
-
-// Message that stores parameters used to apply transformation
+}// Message that stores parameters used to apply transformation
 // to the data layer's data
 message TransformationParameter {
   // For data pre-processing, we can do simple scaling and subtracting the
