@@ -406,6 +406,8 @@ message LayerParameter {
 
   optional HPDataParameter hp_data_param = 1014;
   optional HPTransformationParameter hp_transform_param = 1015; 
+
+  optional InterpParameter interp_param = 1016;
 }
 
 message HPDataParameter {
@@ -1374,9 +1376,21 @@ optional string name = 4;
   optional TransformationParameter transform_param = 36;
   optional LossParameter loss_param = 42;
   optional V0LayerParameter layer = 1;
+  optional InterpParameter interp_param = 50;
 
 
 }
+// add xh
+message InterpParameter {
+  optional int32 height = 1 [default = 0]; // Height of output
+  optional int32 width = 2 [default = 0]; // Width of output
+  optional int32 zoom_factor = 3 [default = 1]; // zoom factor
+  optional int32 shrink_factor = 4 [default = 1]; // shrink factor
+  optional int32 pad_beg = 5 [default = 0]; // padding at begin of input
+  optional int32 pad_end = 6 [default = 0]; // padding at end of input
+}
+
+
 
 // DEPRECATED: V0LayerParameter is the old way of specifying layer parameters
 // in Caffe.  We keep this message type around for legacy support.
